@@ -1,0 +1,20 @@
+{
+  "name": "x-api-skill",
+  "version": "1.1.0",
+  "description": "Lightweight X (Twitter) API v2 client with proxy support and rate limiting",
+  "main": "lib/client.js",
+  "scripts": {
+    "test": "node scripts/test_connection.js",
+    "test:quick": "node scripts/quick_test.js"
+  },
+  "keywords": ["twitter", "x-api", "social-media", "openclaw", "skill"],
+  "author": "OpenClaw Community",
+  "license": "MIT",
+  "engines": { "node": ">=18.0.0" },
+  "dependencies": {
+    "https-proxy-agent": "^7.0.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0"
+  }
+}
