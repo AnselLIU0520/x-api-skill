@@ -1,319 +1,324 @@
-# x-api-skill for OpenClaw
+# X Automated Operations Skill 2.0
 
-Search tweets, monitor keywords, and analyze X (Twitter) accounts — directly from your OpenClaw assistant.
+<div align="center">
 
-[中文文档](README_CN.md)
+![X API](https://img.shields.io/badge/X%20API-v2-blue)
+![OpenClaw Skill](https://img.shields.io/badge/OpenClaw-Skill-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
----
+**AI大模型领域自动化运营工具 - 每日自动执行搜索、互动、发布、推送**
 
-## What You Can Do
+</div>
 
-- **Search tweets** — find recent posts by keyword, hashtag, or phrase
-- **Monitor accounts** — get follower counts, engagement metrics, recent posts
-- **Extract trends** — pull top hashtags and terms from any topic
-- **Build pipelines** — use tweet data as input for summaries, translations, or analysis
+## 📋 功能概述
 
----
+本技能用于自动化运营Twitter/X平台，特别针对AI大模型、科技投资领域，每日自动执行以下任务：
 
-## Step 1: Get X API Access
+- 🔍 **智能搜索** - 搜索AI领域三类目标账号的最新推文
+- 🤝 **互动运营** - 自动点赞、转发、评论相关推文（各5条）
+- ✍️ **内容创作** - 发布1条原创推文（以问句结尾）
+- 📊 **日报推送** - 结构化日报推送到飞书
+- 🔒 **安全可靠** - 完善的错误处理和频率控制
 
-You need a free X Developer account to use this skill.
+## 🚀 快速开始
 
-### 1.1 Apply for Developer Access
+### 1. 环境要求
 
-1. Go to [developer.x.com](https://developer.x.com) and sign in with your X account
-2. Click **"Sign up"** → select **"Free"** tier (sufficient for reading tweets)
-3. Fill in the use case form — describe what you want to build (e.g. "personal research tool to monitor AI topics")
-4. Submit and wait for approval (usually instant for free tier)
+- Node.js 16+ 
+- OpenClaw 环境
+- X开发者账号（需要API权限）
 
-### 1.2 Create a Project and App
+### 2. 安装依赖
 
-1. In the Developer Portal, go to **Projects & Apps** → **New Project**
-2. Give it a name (e.g. "OpenClaw Research")
-3. Select **"Exploring the API"** as your use case
-4. Create a new App inside the project
-
-### 1.3 Get Your Bearer Token
-
-1. Inside your App, go to **"Keys and Tokens"** tab
-2. Under **"Bearer Token"**, click **"Generate"** (or **"Regenerate"** if one exists)
-3. **Copy the token immediately** — it won't be shown again
-4. Store it somewhere safe (password manager recommended)
-
-> ⚠️ Never share your Bearer Token. It grants read access to the X API under your account.
-
----
-
-## Step 2: Install the Skill
-
-### Prerequisites
-
-- **Node.js 18+** — check with `node --version`
-  - Windows: download from [nodejs.org](https://nodejs.org) or run `winget install OpenJS.NodeJS`
-  - macOS: `brew install node` or download from [nodejs.org](https://nodejs.org)
-  - Linux: `sudo apt install nodejs npm` (Ubuntu/Debian) or `sudo dnf install nodejs` (Fedora)
-
-### Install
-
-**Windows (PowerShell):**
-```powershell
-cd $env:USERPROFILE\.openclaw\workspace\skills\x-api
+```bash
+cd skills/x-automated-operations-skill
 npm install
 ```
 
-**macOS / Linux:**
+### 3. 配置环境变量
+
+复制`.env.example`为`.env`并填入你的凭证：
+
 ```bash
-cd ~/.openclaw/workspace/skills/x-api
-npm install
-```
-
----
-
-## Step 3: Configure Your Token
-
-Create a `.env` file in the skill directory:
-
-**Windows (PowerShell):**
-```powershell
-cd $env:USERPROFILE\.openclaw\workspace\skills\x-api
-Copy-Item .env.example .env
-notepad .env
-```
-
-**macOS / Linux:**
-```bash
-cd ~/.openclaw/workspace/skills/x-api
 cp .env.example .env
-nano .env   # or: open -e .env (macOS), gedit .env (Linux)
 ```
 
-Edit the file and set your token:
-```
+编辑`.env`文件，填入以下凭证：
+
+```env
+# X API 凭证（从X开发者后台获取）
 X_BEARER_TOKEN=your_bearer_token_here
+X_CONSUMER_KEY=your_consumer_key_here
+X_CONSUMER_SECRET=your_consumer_secret_here
+X_ACCESS_TOKEN=your_access_token_here
+X_ACCESS_TOKEN_SECRET=your_access_token_secret_here
+X_USER_ID=your_user_id_here
+
+# 可选配置
+HTTPS_PROXY=http://127.0.0.1:17890  # 代理设置（如果需要）
+FEISHU_WEBHOOK=your_webhook_url      # 飞书Webhook（用于推送日报）
+
+# 运营配置
+OPERATION_DELAY=2000    # 操作间隔（毫秒）
+MAX_RETRIES=3           # 最大重试次数
+VERBOSE_LOGGING=true    # 详细日志
 ```
 
-Save and close.
+## 🔑 获取X API权限（关键步骤）
 
----
+### 步骤1：申请X开发者账号
 
-## Step 4: Test the Connection
+1. 访问 [X开发者平台](https://developer.twitter.com)
+2. 注册开发者账号（可能需要验证）
+3. 创建新应用（Application）
+
+### 步骤2：获取API凭证
+
+创建应用后，在"Keys and tokens"标签页获取：
+
+- **API Key and Secret** → `X_CONSUMER_KEY` 和 `X_CONSUMER_SECRET`
+- **Bearer Token** → `X_BEARER_TOKEN` （需要点击"Generate"生成）
+
+### 步骤3：设置应用权限（重要！）
+
+**必须设置为"Read and Write"权限**：
+
+1. 进入应用设置
+2. 找到"App permissions"部分
+3. 选择"Read and Write"（不能是"Read only"）
+4. 保存更改
+
+### 步骤4：获取Access Token（OAuth 1.0a）
+
+1. 在"Keys and tokens"页面，找到"Authentication Tokens"部分
+2. 点击"Generate"生成Access Token和Secret
+3. 或者使用OAuth流程授权（推荐）
+
+### 步骤5：OAuth授权流程（推荐）
+
+使用本技能提供的OAuth工具：
 
 ```bash
-node scripts/quick_test.js
+# 1. 生成授权URL
+node scripts/generate_oauth_url.js
+
+# 2. 用浏览器打开生成的URL，授权应用
+# 3. 获取PIN码
+# 4. 使用PIN码获取Access Token
+node scripts/get_new_token.js <PIN_CODE>
 ```
 
-Expected output:
-```
-Testing X API connection...
-✅ Connected — got 10 tweets
-Sample: OpenAI just released...
-```
+### 权限验证
 
-If it fails, see [Troubleshooting](#troubleshooting) below.
+运行权限测试脚本确保所有权限正常：
 
----
-
-## Step 5: Run Examples
-
-### Monitor keywords — find top tweets on a topic
 ```bash
-node examples/monitor.js
-```
-Searches for `AI`, `LLM`, `machine learning` and prints the most-liked tweets.
-
-To customize keywords, edit `examples/monitor.js`:
-```javascript
-const KEYWORDS = ['your', 'keywords', 'here'];
-const MIN_LIKES = 50;  // minimum likes threshold
+node scripts/test_permissions.js
 ```
 
-### Analyze accounts — get follower and engagement stats
+✅ **成功标志**：所有测试通过，特别是"写入权限"测试
+
+## 📖 使用指南
+
+### 日常运营
+
+执行完整的日常运营任务：
+
 ```bash
-node examples/analyze.js
-```
-Prints follower count and average likes for `@OpenAI`, `@AnthropicAI`, `@GoogleAI`.
+# 预览模式（不实际执行）
+node scripts/daily_operations.js --dry-run
 
-To analyze different accounts, edit `examples/analyze.js`:
-```javascript
-const ACCOUNTS = ['elonmusk', 'sama', 'karpathy'];
+# 正式执行
+node scripts/daily_operations.js
+
+# 调试模式（详细日志）
+node scripts/daily_operations.js --debug
 ```
 
-### Extract terms — pull trending hashtags and abbreviations
+### 自定义配置
+
+编辑配置文件调整运营策略：
+
+- `config/targets.js` - 目标账号配置
+- `config/keywords.js` - 搜索关键词
+- `config/templates.js` - 内容模板
+
+### 定时执行
+
+建议每日执行1-2次，避免频率限制：
+
 ```bash
-node examples/extract.js
-```
-Searches tweets about `machine learning AI` and lists the top 20 recurring terms and hashtags.
+# 使用cron定时执行（Linux/macOS）
+0 9,17 * * * cd /path/to/skill && node scripts/daily_operations.js
 
----
-
-## Using This Skill with OpenClaw
-
-Once installed, you can ask your OpenClaw assistant to use this skill in natural language. No coding required.
-
-### How It Works
-
-OpenClaw reads the `SKILL.md` file to understand what this skill does, then calls the appropriate scripts when you ask for something related to X/Twitter data.
-
-### Example Prompts
-
-**Search and summarize:**
-> "Search for the latest tweets about GPT-5 and give me a summary"
-
-> "What are people saying about the stock market crash today on X?"
-
-> "Find the top 5 most-liked tweets about Anthropic this week"
-
-**Monitor accounts:**
-> "What has @OpenAI tweeted recently?"
-
-> "Compare the follower counts of @OpenAI, @AnthropicAI, and @GoogleAI"
-
-> "Show me @karpathy's latest tweets"
-
-**Extract trends:**
-> "What hashtags are trending in the AI space right now?"
-
-> "Extract the most common terms from recent tweets about crypto"
-
-**Build vocabulary / research:**
-> "Search tweets from tech influencers and extract English terms I should learn"
-
-> "Find tweets about machine learning and list the technical jargon used"
-
-### Setting Up Credentials in OpenClaw
-
-The easiest way is to tell your assistant directly (in your private main session):
-
-> "Remember my X API Bearer Token: [your token]"
-
-Your assistant will store it in memory and use it automatically when running this skill. Alternatively, set it in the `.env` file as described in Step 3.
-
-### Skill Location
-
-OpenClaw looks for skills in:
-- **Windows:** `%USERPROFILE%\.openclaw\workspace\skills\x-api\`
-- **macOS/Linux:** `~/.openclaw/workspace/skills/x-api/`
-
-Make sure `SKILL.md` is present in the root of the skill directory — that's what OpenClaw reads to discover the skill.
-
----
-
-## Use in Your Own Scripts
-
-```javascript
-require('dotenv').config();
-const XAPIClient = require('./lib/client');
-
-const client = new XAPIClient({
-  bearerToken: process.env.X_BEARER_TOKEN,
-  proxy: process.env.HTTPS_PROXY  // optional, see Proxy section
-});
-
-// Search tweets
-const result = await client.searchTweets('ChatGPT', { maxResults: 100 });
-result.data.forEach(t => console.log(t.text));
-
-// Get a user's profile
-const { data: user } = await client.getUserByUsername('OpenAI');
-console.log(`Followers: ${user.public_metrics.followers_count}`);
-
-// Get a user's recent tweets
-const tweets = await client.getUserTweets(user.id, { maxResults: 20 });
+# 使用Windows任务计划
+# 创建每日9:00和17:00执行的任务
 ```
 
-### Full API Reference
+## 🔧 功能模块
 
-#### `searchTweets(query, options)`
-Search recent tweets (last 7 days).
+### 1. 智能搜索 (`lib/client.js`)
+- 支持X API v2搜索
+- 智能评分和排序
+- 避免重复和垃圾内容
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `maxResults` | number | 10 | Results per request (10–100) |
-| `fields` | string | `text,created_at,public_metrics,author_id` | Tweet fields to return |
-| `sinceId` | string | — | Only return tweets newer than this ID |
+### 2. 互动运营 (`scripts/daily_operations.js`)
+- 点赞、转发、评论
+- 智能间隔控制
+- 错误重试机制
 
-#### `getUserByUsername(username)`
-Get a user's profile. Returns name, bio, follower count, verified status.
+### 3. 内容生成 (`config/templates.js`)
+- 智能话题分析
+- 原创推文生成
+- 评论模板库
 
-#### `getUserTweets(userId, options)`
-Get a user's recent tweets (excludes retweets and replies).
+### 4. 飞书集成
+- 结构化日报
+- 运营数据统计
+- 执行结果通知
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `maxResults` | number | 10 | Results per request (5–100) |
+### 5. 工具脚本
+- `scripts/test_permissions.js` - 权限诊断
+- `scripts/test_comment.js` - 评论功能测试
+- `scripts/test_basic.js` - 基础功能测试
 
-#### `getTweet(tweetId)`
-Get a single tweet by ID.
+## 🛠️ 故障排除
 
-#### `sleep(ms?)`
-Wait between requests. Default: 1200ms. Use to avoid rate limits in loops.
+### 常见问题
 
----
+#### Q1: 所有写入操作返回401错误
+**原因**: Access Token没有写入权限
+**解决**：
+1. 确认应用权限为"Read and Write"
+2. 重新获取Access Token
+3. 运行`node scripts/test_permissions.js`验证
 
-## Proxy Setup
+#### Q2: 评论功能失败
+**原因**: X API对评论有额外限制
+**解决**：
+1. 运行`node scripts/test_comment.js`诊断
+2. 确保推文允许回复
+3. 优化评论内容（避免触发风控）
 
-If `api.twitter.com` is blocked on your network (e.g. mainland China), you need a proxy.
+#### Q3: 频率限制（429错误）
+**原因**: API调用太频繁
+**解决**：
+1. 增加`OPERATION_DELAY`值
+2. 减少单次操作数量
+3. 使用代理IP（可选）
 
-**Option A — TUN mode (recommended):** Enable TUN/virtual NIC mode in your proxy client (Clash, Mihomo, etc.). No configuration needed — all traffic is routed automatically.
+#### Q4: 代理连接问题
+**原因**: 网络环境限制
+**解决**：
+1. 配置正确的`HTTPS_PROXY`
+2. 测试网络连接
+3. 考虑使用其他代理方案
 
-**Option B — HTTP proxy via env var:**
+### 调试模式
+
+启用详细日志：
+
+```bash
+# 设置环境变量
+export VERBOSE_LOGGING=true
+
+# 或直接运行
+node scripts/daily_operations.js --debug
 ```
-# .env
-HTTPS_PROXY=http://127.0.0.1:<your_proxy_port>
+
+## 📁 项目结构
+
+```
+x-automated-operations-skill/
+├── README.md                 # 本文档
+├── SKILL.md                  # OpenClaw技能定义
+├── package.json              # 依赖配置
+├── .env.example              # 环境变量模板
+├── .gitignore                # Git忽略配置
+├── lib/
+│   └── client.js             # X API客户端
+├── config/
+│   ├── targets.js            # 目标账号配置
+│   ├── keywords.js           # 搜索关键词配置
+│   └── templates.js          # 内容模板配置
+├── scripts/
+│   ├── daily_operations.js   # 主运营脚本
+│   ├── test_permissions.js   # 权限测试
+│   ├── test_comment.js       # 评论测试
+│   ├── test_basic.js         # 基础测试
+│   ├── generate_oauth_url.js # OAuth授权URL生成
+│   └── get_new_token.js      # Access Token获取
+├── references/               # 参考文档
+└── logs/                     # 执行日志（自动生成）
 ```
 
-To find your proxy port: check your proxy client's settings (usually labeled "HTTP Port" or "Mixed Port").
+## ⚠️ 注意事项
+
+### 安全建议
+1. **不要提交`.env`文件**到版本控制
+2. 定期轮换API凭证
+3. 使用环境变量存储敏感信息
+4. 监控API使用量
+
+### 合规使用
+1. 遵守X API使用条款
+2. 避免垃圾信息行为
+3. 尊重用户隐私
+4. 控制操作频率
+
+### 最佳实践
+1. 每日执行不超过2次
+2. 互动目标控制在5条以内
+3. 内容原创，避免抄袭
+4. 定期更新配置和模板
+
+## 📈 运营效果
+
+### 预期成果
+- 每日与AI领域关键账号互动
+- 建立专业行业形象
+- 获取领域最新动态
+- 自动化运营节省时间
+
+### 数据指标
+- 互动成功率 > 80%
+- 原创推文阅读量提升
+- 粉丝增长（长期）
+- 行业影响力建立
+
+## 🔄 更新日志
+
+### v2.0 (2026-03-25)
+- 重构为模块化架构
+- 增强错误处理和重试机制
+- 添加完整权限诊断工具
+- 优化内容生成模板
+- 完善飞书日报推送
+
+### v1.0 (初始版本)
+- 基础搜索和互动功能
+- 简单的原创内容生成
+- 基础飞书集成
+
+## 📞 支持与贡献
+
+### 问题反馈
+遇到问题请：
+1. 查看"故障排除"章节
+2. 运行测试脚本诊断
+3. 提交Issue（附详细日志）
+
+### 功能建议
+欢迎提出改进建议：
+- 更多互动策略
+- 更好的内容模板
+- 其他平台集成
+
+### 安全报告
+发现安全问题请私密报告。
 
 ---
 
-## Rate Limits
+**免责声明**: 本工具仅供学习和合规使用，使用者需遵守X平台规则和相关法律法规。不当使用可能导致账号受限。
 
-X API free tier limits:
-
-| What | Limit |
-|------|-------|
-| Tweets read | 500,000 / month |
-| Search requests | ~1 req/sec |
-| User lookups | 300 / 15 min |
-
-The client adds a **1200ms delay** between requests by default. To change it:
-```javascript
-const client = new XAPIClient({
-  bearerToken: process.env.X_BEARER_TOKEN,
-  delayMs: 2000  // 2 seconds between requests
-});
-```
-
----
-
-## Troubleshooting
-
-**`Error: X_BEARER_TOKEN not set`**
-→ Make sure `.env` exists in the skill directory and contains your token.
-
-**`HTTP 401`**
-→ Token is invalid or expired. Go to developer.x.com → your App → Keys and Tokens → Regenerate Bearer Token.
-
-**`HTTP 429`**
-→ Rate limit hit. Increase `delayMs` or reduce `maxResults`.
-
-**Connection timeout / socket hang up**
-→ Your network blocks `api.twitter.com`. Set up a proxy (see [Proxy Setup](#proxy-setup)).
-
-**`Cannot find module 'https-proxy-agent'`**
-→ Run `npm install` in the skill directory.
-
----
-
-## Security
-
-- `.env` is listed in `.gitignore` — your token won't be committed to Git
-- Never paste your Bearer Token in chat, code comments, or public files
-- Rotate your token periodically at developer.x.com
-- The free tier is read-only — this skill cannot post tweets
-
----
-
-## License
-
-MIT
+**License**: MIT

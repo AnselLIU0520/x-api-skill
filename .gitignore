@@ -1,27 +1,46 @@
-# Dependencies
-node_modules/
-package-lock.json
-yarn.lock
-
-# Environment variables
+# 环境变量文件
 .env
 .env.local
-.env.*.local
+.env.*
+!.env.example
 
-# Output
-output/
+# 依赖目录
+node_modules/
+
+# 日志文件
+logs/
 *.log
 
-# OS
+# 临时文件
+temp_oauth_token.json
+*.tmp
+*.temp
+
+# 操作系统文件
 .DS_Store
 Thumbs.db
 
-# IDE
+# 编辑器文件
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Test
+# 测试相关
 coverage/
-.nyc_output/
+.nyc_output
+
+# 构建产物
+dist/
+build/
+*.min.js
+
+# 用户数据
+data/
+uploads/
+
+# 敏感信息
+*.pem
+*.key
+*.crt
+*.p12

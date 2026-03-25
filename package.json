@@ -1,20 +1,42 @@
 {
-  "name": "x-api-skill",
-  "version": "1.1.0",
-  "description": "Lightweight X (Twitter) API v2 client with proxy support and rate limiting",
-  "main": "lib/client.js",
+  "name": "x-automated-operations-skill",
+  "version": "2.0.0",
+  "description": "X/Twitter自动化运营技能 - AI大模型领域账号日常运营",
+  "main": "scripts/daily_operations.js",
   "scripts": {
-    "test": "node scripts/test_connection.js",
-    "test:quick": "node scripts/quick_test.js"
+    "start": "node scripts/daily_operations.js",
+    "dry-run": "node scripts/daily_operations.js --dry-run",
+    "test": "node scripts/test_permissions.js",
+    "oauth": "node scripts/generate_oauth.js",
+    "lint": "eslint .",
+    "logs": "cat logs/latest.log"
   },
-  "keywords": ["twitter", "x-api", "social-media", "openclaw", "skill"],
-  "author": "OpenClaw Community",
+  "keywords": [
+    "twitter",
+    "x-api",
+    "automation",
+    "social-media",
+    "ai",
+    "operations"
+  ],
+  "author": "Bibi (OpenClaw Assistant)",
   "license": "MIT",
-  "engines": { "node": ">=18.0.0" },
   "dependencies": {
-    "https-proxy-agent": "^7.0.0"
+    "dotenv": "^16.6.1",
+    "https-proxy-agent": "^7.0.6"
   },
   "devDependencies": {
-    "dotenv": "^16.0.0"
-  }
+    "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-repo/x-automated-operations-skill"
+  },
+  "bugs": {
+    "url": "https://github.com/your-repo/x-automated-operations-skill/issues"
+  },
+  "homepage": "https://github.com/your-repo/x-automated-operations-skill#readme"
 }
